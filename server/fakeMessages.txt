@@ -1,0 +1,18 @@
+[
+  {
+    createdAt: "2016-10-08T01:51:52.270Z",
+    objectId: "XDWjdfkfoG",
+    roomname: "lobby",
+    text: "1 msg",
+    updatedAt:"2016-10-08T01:59:52.270Z",
+    username: "tony"
+  },
+  {
+  createdAt: "2016-10-08T01:52:52.270Z",
+  objectId: "UDSKOjgkf2oG",
+  roomname: "lobby",
+  text: "2 msg",
+  updatedAt:"2016-10-08T01:53:52.270Z",
+  username: "david"
+  }
+];""""
