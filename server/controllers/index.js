@@ -6,40 +6,43 @@ var Promise = require('bluebird');
 
 module.exports = {
   messages: {
-    get: function (req, res) {}, // a function which handles a get request for all messages
+    get: function (req, res) { // a function which handles a get request for all messages
+      var messages = new Promise(function(todo, todont) {
+          sql.query('select * from messages order by id desc limit 40;', function(err, results, fields) {
+          console.log('getting messages from db', results);
+          return err ? todont(err) : todo(results);
+        });
+      }).then(function(results) {
+          console.log('here are results from db', results);
+          var properResults = [].concat(results.reduce((acc, cur) => { 
+            return acc.concat( { 
+              text: cur.text,
+              username: 'zippy',
+              roomname: 'lobby',
+              createdAt: '',
+              updatedAt: '',
+              objectId: cur.objectId
+            } );
+          }, []));
+          res.send(properResults);
+      }).catch(function(err) {
+        console.log('couldn\'t insert message into database', err);
+      });
+    }, 
     post: function (req, res) { // a function which handles posting a message to the database
       console.log('body from user POST is: ', req.body);
-      // var user = sql.query('SELECT id FROM users WHERE users.user=\'' + req.body.username + '\';');
-      // var room = sql.query('SELECT id FROM rooms WHERE rooms.roomname=\'' + req.body.roomname + '\';');
-      // if (user.length === 0) {
-      //   sql.query('INSERT INTO `users` (`id`, `user`) VALUES ( NULL, ' + req.body.username + '\';');
-      //   user = sql.query('SELECT id FROM users WHERE users.user=\'' + req.body.username + '\';');
-      // }
 
       var user = new Promise(function(todo, todont) {
-        sql.query(
-          'SELECT id FROM users WHERE users.user=\'' + req.body.username + '\';', function (err, results, fields) {
-            if (err) {
-              return todont(err);
-            }
-            return todo(results);
-        }) 
-      }).then(function(user) {
-          if (user.length === 0) {
-            sql.query('INSERT INTO `users` (`id`, `user`) VALUES ( NULL, \'' + req.body.username + '\');');
-          }
-        }).catch(function(err) {
-          console.log('couldn\'t insert blank user', err);
+        var newid = Math.floor(Math.random()* 1292665987).toString(36); 
+          sql.query('INSERT INTO `messages` (`id`, `text`, `user_id`, `room_id`, `objectId` ) VALUES ( NULL, ' + mysql.escape(req.body.text) + ', \'1\', \'1\', \'' + newid + '\');', function(err, results, fields) {
+          console.log('inserted new data into database');
+          return err ? todont(err) : todo(results);
+          } );
+      }).catch(function(err) {
+        console.log('couldn\'t insert message into database', err);
       });
-      
-      // if (room.length === 0) {
-      //   sql.query('INSERT INTO `rooms` (`id`, `roomname`) VALUES ( NULL, ' + req.body.roomname + '\';');
-      //   user = sql.query('SELECT id FROM rooms WHERE rooms.roomname=\'' + req.body.roomname + '\';');
-      // } 
-      // sql.query('INSERT INTO `messages` (`id`, `text`, `user_id`, `room_id`) VALUES ( NULL, ' + mysql.escape(req.body.text) + ', \'' + user + '\', \'' + room + '\');' );
     } 
   },
-
 
   users: {
     // Ditto as above
@@ -47,19 +50,3 @@ module.exports = {
     post: function (req, res) {}
   }
 };
-
-      // var user = new Promise(function(todo, todont) {
-      //   sql.query(
-      //     'SELECT id FROM users WHERE users.user=\'' + req.body.username + '\';', function (err, results, fields) {
-      //       if (err) {
-      //         return todont(err);
-      //       }
-      //       return todo(results);
-      //   }).then(function(user) {
-      //     if (user.length === 0) {
-      //       sql.query('INSERT INTO `users` (`id`, `user`) VALUES ( NULL, ' + req.body.username + '\';')
-      //     }
-      //   }).catch(function(err) {
-      //     console.log('couldn\'t insert blank user', err);
-      //   }); 
-      // };

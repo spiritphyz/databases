@@ -46,7 +46,8 @@
       data: {order: '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
-        var messages = data.results;
+        console.log(data.results, data);
+        var messages = data;
         if (!app.currentRoom) {
           currentRoom = 'lobby';
         }
@@ -143,6 +144,16 @@
     }
   });
 
+  $('.form').on('submit', function(x){
+    x.preventDefault();
+    var messageObj = {};
+    messageObj.text = $('.chatSubmit').val();
+    messageObj.username = location.search.split('username=')[1];
+    messageObj.roomname = $('#roomSelect option:selected').text();
+    console.log('sent a message!');
+    app.send(messageObj);
+    $('.chatSubmit').val('');
+  });
 
   $('#chats').on('click', '.username', function() {
     var friend = $(this).attr('user');
